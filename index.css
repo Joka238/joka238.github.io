@@ -2,6 +2,7 @@ body{background-color: black;}
 
 .login{
   width: 382px;
+  padding: 92px;
   background-color: 0FF;
   border-radius: 12px;
 }
