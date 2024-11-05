@@ -1,11 +1,11 @@
-body{background-color: cyan;}
+body{background-color: black;}
 
 .login{  
-        width: 382px;  
+        width: 400px;  
         margin: auto;  
         margin: 20 0 0 450px;  
         padding: 80px;  
-        background: #23463f;  
+        background: #25463f;  
         border-radius: 15px ;  
           
 }  
