@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>telepaint · Status</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;max-width:900px;margin:40px auto;padding:0 16px;line-height:1.45}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .badge{padding:4px 8px;border-radius:8px;background:#eee;font-size:.85rem}
+    code{background:#f6f8fa;padding:2px 6px;border-radius:6px}
+    .card{border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:12px 0}
+    .ok{color:#065f46}
+    .warn{color:#92400e}
+    .err{color:#7f1d1d}
+    .muted{color:#6b7280}
+    footer{margin-top:32px;font-size:.9rem;color:#6b7280}
+    a{color:#2563eb;text-decoration:none}
+    a:hover{text-decoration:underline}
+    pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#0b1020;color:#e5e7eb;padding:12px;border-radius:10px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>telepaint: GitHub Pages Transport</h1>
+    <span class="badge" id="siteStatus">lädt…</span>
+  </header>
+
+  <div class="card">
+    <p>Diese Seite dient NUR als Transport-Layer. Trotzdem siehst du hier den Live-Status der beiden JSON-Dateien:</p>
+    <ul>
+      <li><a id="linkA" href="session/a.json" target="_blank">session/a.json</a> – <span id="statusA" class="muted">prüfe…</span></li>
+      <li><a id="linkB" href="session/b.json" target="_blank">session/b.json</a> – <span id="statusB" class="muted">prüfe…</span></li>
+    </ul>
+  </div>
+
+  <div class="card" id="lastData" style="display:none;">
+    <h3>Letzte Inhalte (gekürzt)</h3>
+    <p class="muted">Nur zur Sichtprüfung. Die Clients verschlüsseln/entschlüsseln selbst.</p>
+    <pre id="preview"></pre>
+  </div>
+
+  <div class="card">
+    <h3>Wenn hier 404 steht</h3>
+    <ol>
+      <li>Repo muss exakt <code>USERNAME.github.io</code> heißen und <strong>public</strong> sein.</li>
+      <li>Settings → Pages → <strong>Deploy from a branch</strong>: Branch <code>main</code>, Folder <code>/</code>.</li>
+      <li>Dateien gehören INS Repo-Root: <code>index.html</code>, <code>.nojekyll</code>, <code>session/a.json</code>, <code>session/b.json</code>.</li>
+    </ol>
+  </div>
+
+  <footer>telepaint viewer • keine Tokens, keine Geheimnisse • GitHub Pages statisch</footer>
+
+<script>
+(async () => {
+  const siteBadge = document.getElementById('siteStatus');
+  const statusA = document.getElementById('statusA');
+  const statusB = document.getElementById('statusB');
+  const preview = document.getElementById('preview');
+  const lastData = document.getElementById('lastData');
+
+  siteBadge.textContent = 'aktiv';
+  siteBadge.style.background = '#d1fae5';
+
+  async function check(url, labelEl){
+    try{
+      const res = await fetch(url + '?t=' + Date.now());
+      if(res.ok){
+        labelEl.innerHTML = '<span class="ok">200 OK</span>';
+        const txt = await res.text();
+        return txt;
+      } else if (res.status === 404){
+        labelEl.innerHTML = '<span class="err">404 nicht gefunden</span>';
+        return null;
+      } else {
+        labelEl.innerHTML = '<span class="warn">' + res.status + ' ' + res.statusText + '</span>';
+        return null;
+      }
+    }catch(e){
+      labelEl.innerHTML = '<span class="err">Fehler beim Laden</span>';
+      return null;
+    }
+  }
+
+  const [aTxt, bTxt] = await Promise.all([check('session/a.json', statusA), check('session/b.json', statusB)]);
+  let out = '';
+  if (aTxt) out += 'a.json\n' + aTxt.substring(0, 400) + (aTxt.length>400?'\n…':'') + '\n\n';
+  if (bTxt) out += 'b.json\n' + bTxt.substring(0, 400) + (bTxt.length>400?'\n…':'') + '\n';
+  if (out){
+    preview.textContent = out;
+    lastData.style.display = '';
+  }
+})();
+</script>
+</body>
+</html>
