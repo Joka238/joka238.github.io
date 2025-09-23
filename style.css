@@ -1,0 +1,9 @@
+body {
+background: #f0f0f0;
+color: #333;
+font-family: sans-serif;
+text-align: center;
+padding: 2em;
+}
+h1 { color: #555; }
+p { max-width: 600px; margin: 0.5em auto; line-height: 1.5; }
